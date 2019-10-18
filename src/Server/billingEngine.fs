@@ -1,8 +1,7 @@
 ﻿module Billing
 
 open CustomerCart
-open Common
-open ItemDomain
+open Shared
 
 let shippingFee = 15.00m
 let amountToPayForFreeShipping = 50.00m
@@ -27,7 +26,7 @@ let getCartItemTotal selectedProducts =
     (0, selectedProducts)
     ||> Map.fold(fun accTotal _ count -> accTotal + count)
 
-let getOrderTotalTaxes (selectedProducts: Map<StoreProduct, int>) =
+let getOrderTotalTaxes selectedProducts =
     (0.00m, selectedProducts)
     ||> Map.fold(fun accTaxes product count ->
         let decimalCount = count |> decimal
@@ -35,10 +34,10 @@ let getOrderTotalTaxes (selectedProducts: Map<StoreProduct, int>) =
         let environmentalTaxes = 0.05m
 
         match product with
-        | Book b -> accTaxes + (baseTaxes * b.Details.Price * decimalCount)
-        | WirelessHeadphones wh ->
+        | Book (b, _) -> accTaxes + (baseTaxes * b.Details.Price * decimalCount)
+        | WirelessHeadphones (wh, _) ->
             accTaxes + (baseTaxes * wh.Details.Price * decimalCount) + (environmentalTaxes * wh.Details.Price * decimalCount)
-        | Television t ->
+        | Television (t, _) ->
             accTaxes + (baseTaxes * t.ProductDetails.Price * decimalCount) + (environmentalTaxes * t.ProductDetails.Price * decimalCount)
         | _ -> accTaxes
     )

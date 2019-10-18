@@ -11,24 +11,27 @@ open Thoth.Json
 
 open Shared
 
-// The model holds data that you want to keep track of while the application is running
-// in this case, we are keeping track of a counter
-// we mark it as optional, because initially it will not be available from the client
-// the initial value will be requested from server
-type Model = { Counter: Counter option }
+type Model = { Counter: Counter option; Products : TestSerializeProduct [] option }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
     | Increment
     | Decrement
+    | FetchProducts
+    | GotProducts of TestSerializeProduct []
     | InitialCountLoaded of Counter
 
 let initialCounter () = Fetch.fetchAs<Counter> "/api/init"
+let fetchProducts () = Fetch.fetchAs<TestSerializeProduct[]> "/api/products"
+
+// do the equivalent for get products coming from the back-end here.
+
+// will start display the cart info for the customers
 
 // defines the initial state and initial command (= side-effect) of the application
 let init () : Model * Cmd<Msg> =
-    let initialModel = { Counter = None }
+    let initialModel = { Counter = None ; Products = None }
     let loadCountCmd =
         Cmd.OfPromise.perform initialCounter () InitialCountLoaded
     initialModel, loadCountCmd
@@ -38,6 +41,11 @@ let init () : Model * Cmd<Msg> =
 // these commands in turn, can dispatch messages to which the update function will react.
 let update (msg : Msg) (currentModel : Model) : Model * Cmd<Msg> =
     match currentModel.Counter, msg with
+    | _, FetchProducts ->
+        currentModel, Cmd.OfPromise.perform fetchProducts () GotProducts
+    | _, GotProducts products ->
+        let nextModel = { currentModel with Products = Some products }
+        nextModel, Cmd.none
     | Some counter, Increment ->
         let nextModel = { currentModel with Counter = Some { Value = counter.Value + 1 } }
         nextModel, Cmd.none
@@ -45,10 +53,9 @@ let update (msg : Msg) (currentModel : Model) : Model * Cmd<Msg> =
         let nextModel = { currentModel with Counter = Some { Value = counter.Value - 1 } }
         nextModel, Cmd.none
     | _, InitialCountLoaded initialCount->
-        let nextModel = { Counter = Some initialCount }
+        let nextModel = { Counter = Some initialCount; Products = None }
         nextModel, Cmd.none
     | _ -> currentModel, Cmd.none
-
 
 let safeComponents =
     let components =
@@ -96,7 +103,10 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]
                 Columns.columns []
                     [ Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
-                      Column.column [] [ button "+" (fun _ -> dispatch Increment) ] ] ]
+                      Column.column [] [ button "+" (fun _ -> dispatch Increment) ] 
+                      Column.column [] [ button "Hit Products Endpoint" (fun _ -> dispatch FetchProducts ) ] 
+                      Column.column [] [ label [] [ str (sprintf "%A" model.Products)] ] 
+                      ] ]
 
           Footer.footer [ ]
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]

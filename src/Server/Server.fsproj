@@ -6,16 +6,20 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="paket.references" />
+        <Compile Include="..\Shared\Shared.fs">
+          <Link>Shared.fs</Link>
+        </Compile>
         <Compile Include="commonCommerceHelpers.fs" />
         <Compile Include="itemDomains.fs" />
+        <Compile Include="database.fs" />
         <Compile Include="customerAccount.fs" />
         <Compile Include="customerCart.fs" />
         <Compile Include="billingEngine.fs" />
-        <Compile Include="..\Shared\Shared.fs" />
         <Compile Include="Server.fs" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="FSharp.Data" Version="3.3.1" />
+      <PackageReference Include="LiteDB.FSharp" Version="2.12.0" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

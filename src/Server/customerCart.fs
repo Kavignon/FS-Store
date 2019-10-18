@@ -4,10 +4,10 @@ open System
 
 open ItemDomain
 open customerAccount
-open Common
+open Shared
 
 type PaymentMethod =
-    | Visa of cardOwnerName: string * cardNumer: string * expirationDate: DateTime * cardSecurityCode: int * wasCloned: bool
+    | Visa of cardOwnerName: string * cardNumber: string * expirationDate: DateTime * cardSecurityCode: int * wasCloned: bool
     | Debit of cardOwnerName: string * cardNumber: string * BankName: string * wasCloned: bool
 
     member x.isCardValid =

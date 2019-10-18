@@ -7,7 +7,7 @@ open FSharp.Control.Tasks.V2
 open Giraffe
 open Saturn
 open Shared
-
+open Database
 
 let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
 
@@ -22,6 +22,12 @@ let webApp = router {
         task {
             let counter = {Value = 42}
             return! json counter next ctx
+        })
+
+    get "/api/products" (fun next ctx ->
+        task {
+            let products = getStoreItems()
+            return! json products next ctx
         })
 }
 

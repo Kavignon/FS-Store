@@ -1,170 +1,13 @@
 ﻿module ItemDomain
 
 open Common
+open Shared
 open System
-
-
-type ProductDimension = {
-    Heigth: decimal
-    Width: decimal
-    Depth: decimal option
-}
-
-type ProductColor =
-    | Red
-    | Black
-    | White
-    | Gray
-    | Blue
-    | Green
-    | NotSupportedByStore
-
-type Brand =
-    | Toshiba
-    | Sony
-    | Microsoft
-    | Intel
-    | AMD
-    | Nintendo
-    | Bose
-    | Asus
-    | Apple
-    | NotSupportedByStore
-
-type SupportedLanguage =
-    | English
-    | French
-    | NotSupportedByStore
 
 type GeneratedTypeFromStore =
     | Headphones                of value: ProductDb.Headphone
     | ReadingMaterial           of value: ProductDb.Book
     | Computer                  of value: ProductDb.Computer
-
-type CommonProductInformation  = {
-    Name:           string
-    Weight:         float
-    ShippingWeight: float
-    AverageReviews: float
-    Dimensions:     ProductDimension
-    Price:          decimal
-    Color:          ProductColor
-    Brand:          Brand
-}
-
-type DeviceDisplay =
-    | StandardDefinition    of int
-    | EnhanceDefinition     of int
-    | HighDefinition        of int
-    | UltraHighDefinition   of int
-
-type OperatingSystem =
-    | Windows7
-    | Windows8
-    | Windows10
-    | MacOS
-    | Linux
-    | XboxOne
-    | Playstation4
-    | Switch
-
-type CableConnection =
-    | USB1
-    | USB2
-    | USB3
-    | USBC
-    | HDMI
-    | MiniHDMI
-    | PowerAdapter
-
-type Device = {
-    ProductDetails:     CommonProductInformation
-    ModelNumber:        string
-    IsWireless:         bool
-    SupportedOS:        OperatingSystem list
-    HardwareInterfaces: CableConnection list
-    Resolution:         DeviceDisplay
-}
-
-type Keyboard = {
-    DeviceDefinition:   Device
-    IsMechanical:       bool
-    IsGamingKeyboard:   bool
-    KeyCount:           byte
-}
-
-type FightingPad = {
-    DeviceDescription:      Device;
-    AreBatteriesRequired:   bool
-    HasProgrammableButtons: bool
-}
-
-type DeviceInput =
-    | Keyboard  of Keyboard
-    | Gamepad   of FightingPad
-
-type IntelProcessorSeries =
-    | IntelCorei3
-    | IntelCorei5
-    | IntelCorei7
-    | IntelCorei9
-
-type AmdProcessorSeries =
-    | Ryden
-    | Athlon
-    | AthlonII
-    | ASeries
-    | ESeries
-    | FSeries
-
-type ProcessorSeries =
-    | Intel     of IntelProcessorSeries
-    | AMD       of AmdProcessorSeries
-
-type DDR =
-    | DDR2
-    | DDR3
-    | DDR4
-
-type CPU = {
-    Details:            CommonProductInformation
-    CoreCount:          byte
-    Series:             ProcessorSeries
-    ProcessorSpeed:     float
-    OverclockedSpeed:   float
-    Wattage:            int
-    YearModel:          DateTime
-}
-
-type Computer = {
-    Details:                CommonProductInformation
-    Resolution:             DeviceDisplay
-    Cpu:                    CPU
-    Ram:                    int
-    CacheMemory:            int option
-    DdrRam:                 DDR option
-    RunningOperatingSystem: OperatingSystem
-    DeviceInputs:           DeviceInput list
-}
-
-type GameConsole = {
-    Hardware:               Computer
-    SupportedResolutions:   DeviceDisplay list
-    Inputs:                 CableConnection list
-    IsHandHandledDevice:    bool
-    MaxControllerSupported: byte
-}
-
-type BookCategory =
-    | Fantasy
-    | ``Computer Science``
-    | ``Graphic Novel``
-
-type BookFormat =
-    | Paperback
-    | Hardcover
-    | Pdf
-    | KindleVersion
 
 let bookCategory (book: ProductDb.Book)=
     match book.Category.Value with
@@ -172,31 +15,6 @@ let bookCategory (book: ProductDb.Book)=
     | Prefix "Comp" _ & Suffix "Sciences" _ -> Some ``Computer Science``
     | _ -> None
 
-type Book = {
-    AuthorName:     string
-    Format:         BookFormat
-    Summary:        string
-    Details:        CommonProductInformation
-    Category:       BookCategory
-    PageCount:      int
-    ISBN:           string
-    Language:       SupportedLanguage
-    ReleasedDate:   DateTime
-}
-
-type HeadphoneFit =
-    | ``In ear``
-    | ``On ear``
-    | ``Over ear``
-
-type HeadphoneProduct = {
-    Details:                CommonProductInformation
-    Fit:                    HeadphoneFit
-    BatteryLife:            sbyte option
-    ReleaseDate:            DateTime;
-    AreWireless:            bool
-    IsNoiseCancelActive:    bool
-}
 
 type DbProductUtils =
     static member getFitFromHeadphones (h: ProductDb.Headphone) =
@@ -281,21 +99,6 @@ let getProductInfoFromProvider providerType =
                 Brand = computerDb.Manufacturer |> DbProductUtils.getBrandFromDbProduct
             }
 
-[<StructuralComparison; StructuralEquality>]
-type StoreProduct =
-    | Book                  of novel:       Book
-    | WirelessHeadphones    of headphones:  HeadphoneProduct
-    | Television            of television:  Device
-    | Laptop                of laptop:      Computer
-    | GameConsole           of console:     GameConsole
-with
-    member x.ProductPrice =
-        match x with
-        | Book b -> b.Details.Price
-        | WirelessHeadphones wh -> wh.Details.Price
-        | Television t -> t.ProductDetails.Price
-        | Laptop l -> l.Details.Price
-        | GameConsole gc -> gc.Hardware.Details.Price
 
 let getStoreHeadphones storeProductList =
     Array.map(fun h ->
@@ -308,7 +111,7 @@ let getStoreHeadphones storeProductList =
             AreWireless = h.IsWireless.Value
             IsNoiseCancelActive = h.IsNoiseCancelled.Value
         }
-        WirelessHeadphones(product)
+        WirelessHeadphones(product, "WireLessId")
     )
     >> Array.append storeProductList
 
@@ -326,7 +129,7 @@ let getStoreBooks storeProductList =
             Category = Fantasy // Missing function to convert from the XML document
             ReleasedDate = DateTime.Now // Missing release date from XML document
         }
-        Book(product)
+        Book(product, "SomeBookId")
     )
     >> Array.append storeProductList
 
@@ -352,7 +155,7 @@ let getStoreComputers storeProductList =
             RunningOperatingSystem = Windows10
             DeviceInputs = []
         }
-        Laptop(product)
+        Laptop(product, "LaptopId")
     )
     >> Array.append storeProductList
 
