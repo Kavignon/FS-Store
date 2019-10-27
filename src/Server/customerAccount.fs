@@ -36,12 +36,12 @@ type CountryPrefix = CountryPrefix of int
 type Phone = { CountryPrefix:CountryPrefix; LocalNumber:string }
 
 type Contact = {
-    CustomerName: PersonalName;
-    BillingAddress: CanadaAddress;
-    ShippingAddress: CanadaAddress option;
-    IsShippingToBillingAddress: bool;
-    Email: Email;
-    Phone: Phone option;
+    CustomerName: PersonalName
+    BillingAddress: CanadaAddress
+    ShippingAddress: CanadaAddress option
+    IsShippingToBillingAddress: bool
+    Email: Email
+    Phone: Phone option
 }
 
 // Put it all together into a CustomerAccount type
