@@ -1,4 +1,4 @@
-﻿module ItemDomain
+module ItemDomain
 
 open Common
 open Shared
@@ -14,7 +14,6 @@ let bookCategory (book: ProductDb.Book)=
     | Prefix "Fan" _ -> Some Fantasy
     | Prefix "Comp" _ & Suffix "Sciences" _ -> Some ``Computer Science``
     | _ -> None
-
 
 type DbProductUtils =
     static member getFitFromHeadphones (h: ProductDb.Headphone) =
@@ -58,11 +57,11 @@ let getProductInfoFromProvider providerType =
                 ShippingWeight = dbHeadphones.Weigth.Value |> float // Must be updated to ShipingWeight
                 AverageReviews = 4.2 // Update xml with AverageReview field
                 Dimensions = {
-                    Heigth = dbHeadphones.Heigth.Value
-                    Width = dbHeadphones.Width.Value
-                    Depth = Some (dbHeadphones.Depth.Value)
+                    Heigth = float dbHeadphones.Heigth.Value
+                    Width = float dbHeadphones.Width.Value
+                    Depth = Some (float dbHeadphones.Depth.Value)
                 }
-                Price = dbHeadphones.Price.Value
+                Price = float dbHeadphones.Price.Value
                 Color = dbHeadphones.Color.Value |> DbProductUtils.getColorFromDbProduct
                 Brand = dbHeadphones.Manufacturer.Name |> DbProductUtils.getBrandFromDbProduct
             }
@@ -74,11 +73,11 @@ let getProductInfoFromProvider providerType =
                 AverageReviews = dbBook.ReviewAverage.Value |> float
                 Dimensions = {
                     // Add dimensions to book definition
-                    Heigth = 1.00m
-                    Width = 1.00m
-                    Depth = Some 1.00m
+                    Heigth = 1.00
+                    Width = 1.00
+                    Depth = Some 1.00
                 }
-                Price = dbBook.Price.Value
+                Price = float dbBook.Price.Value
                 Color = Red // Provide book color in definition
                 Brand = Toshiba //Waiting for up book publisher companies in definition
             }
@@ -90,33 +89,35 @@ let getProductInfoFromProvider providerType =
                 AverageReviews = 4.5 // reviews
                 Dimensions = {
                     // Add dimensions to book definition
-                    Heigth = computerDb.Height.Value |> decimal
-                    Width = computerDb.Height.Value |> decimal
-                    Depth = Some (computerDb.Height.Value |> decimal)
+                    Heigth = float computerDb.Height.Value
+                    Width = float computerDb.Height.Value
+                    Depth = Some (float computerDb.Height.Value)
                 }
-                Price = computerDb.Price.Value
+                Price = float computerDb.Price.Value
                 Color = computerDb.Color.Value |>DbProductUtils.getColorFromDbProduct // Provide book color in definition
                 Brand = computerDb.Manufacturer |> DbProductUtils.getBrandFromDbProduct
             }
 
 
-let getStoreHeadphones storeProductList =
-    Array.map(fun h ->
+let getStoreHeadphones headphones storeProductList =
+    headphones
+    |> Array.map(fun h ->
         let headphonesInfo = Headphones(h) |> getProductInfoFromProvider
         let product = {
             Details = headphonesInfo
             Fit = DbProductUtils.getFitFromHeadphones h
-            BatteryLife = Some(h.BatteryLife.Value |> sbyte)
+            BatteryLife = Some(h.BatteryLife.Value)
             ReleaseDate = h.ReleaseDate.Value
             AreWireless = h.IsWireless.Value
             IsNoiseCancelActive = h.IsNoiseCancelled.Value
         }
         WirelessHeadphones(product, "WireLessId")
     )
-    >> Array.append storeProductList
+    |> Array.append storeProductList
 
-let getStoreBooks storeProductList =
-    Array.map(fun b ->
+let getStoreBooks books storeProductList =
+    books
+    |> Array.map(fun b ->
         let bookInfo = ReadingMaterial(b) |> getProductInfoFromProvider
         let product = {
             Details = bookInfo
@@ -131,14 +132,15 @@ let getStoreBooks storeProductList =
         }
         Book(product, "SomeBookId")
     )
-    >> Array.append storeProductList
+    |> Array.append storeProductList
 
-let getStoreComputers storeProductList =
-    Array.map(fun computer ->
+let getStoreComputers computers storeProductList =
+    computers
+    |> Array.map(fun computer ->
         let computerInfo = Computer(computer) |> getProductInfoFromProvider
         let computerCpu = {
             Details = computerInfo // Need function to retrieve it from XmlProvider<...>.Computer
-            CoreCount = 4uy // Need function to retrieve it from XmlProvider<...>.Computer
+            CoreCount = 4 // Need function to retrieve it from XmlProvider<...>.Computer
             Series = Intel(IntelCorei7) // Need function to retrieve it from XmlProvider<...>.Computer
             ProcessorSpeed = 3.2 // Need function to retrieve it from XmlProvider<...>.Computer
             OverclockedSpeed = 5.2 // Need function to retrieve it from XmlProvider<...>.Computer
@@ -157,10 +159,10 @@ let getStoreComputers storeProductList =
         }
         Laptop(product, "LaptopId")
     )
-    >> Array.append storeProductList
+    |> Array.append storeProductList
 
 let loadStoreProducts (storeItems: ProductDb.Items)  =
     [||]
-    |> getStoreHeadphones <| storeItems.Headphones
-    |> getStoreBooks <| storeItems.Books
-    |> getStoreComputers <| storeItems.Computers
+    |> getStoreHeadphones storeItems.Headphones
+    |> getStoreBooks storeItems.Books
+    |> getStoreComputers storeItems.Computers

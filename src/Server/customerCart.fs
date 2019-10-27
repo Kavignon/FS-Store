@@ -1,4 +1,4 @@
-﻿module CustomerCart
+module CustomerCart
 
 open System
 
@@ -30,8 +30,7 @@ with
 
     member x.getCartSubtotal =
         match x.SelectedItems with
-        | None -> 0.00m
+        | None -> 0.00
         | Some storeProducts ->
-            (0.00m, storeProducts)
-            ||> Map.fold(fun accumulatedSubtotal product qty ->
-                accumulatedSubtotal + (product.ProductPrice * decimal qty))
+            (0.00, storeProducts)
+            ||> Map.fold(fun accumulatedSubtotal product qty -> accumulatedSubtotal + (product.ProductPrice * float qty))

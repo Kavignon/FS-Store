@@ -34,11 +34,11 @@ let getOrderTotalTaxes selectedProducts =
         let environmentalTaxes = 0.05m
 
         match product with
-        | Book (b, _) -> accTaxes + (baseTaxes * b.Details.Price * decimalCount)
+        | Book (b, _) -> accTaxes + (baseTaxes * decimal b.Details.Price * decimalCount)
         | WirelessHeadphones (wh, _) ->
-            accTaxes + (baseTaxes * wh.Details.Price * decimalCount) + (environmentalTaxes * wh.Details.Price * decimalCount)
+            accTaxes + (baseTaxes * decimal wh.Details.Price * decimalCount) + (environmentalTaxes * decimal wh.Details.Price * decimalCount)
         | Television (t, _) ->
-            accTaxes + (baseTaxes * t.ProductDetails.Price * decimalCount) + (environmentalTaxes * t.ProductDetails.Price * decimalCount)
+            accTaxes + (baseTaxes * decimal t.ProductDetails.Price * decimalCount) + (environmentalTaxes * decimal t.ProductDetails.Price * decimalCount)
         | _ -> accTaxes
     )
 
@@ -54,10 +54,10 @@ let processCartCheckout (cart: ShoppingCart) =
             let subTotal = cart.getCartSubtotal
             let orderSummary = {
                 ItemsOrdered = itemCount
-                StartingSubtotal = subTotal
+                StartingSubtotal = decimal subTotal
                 ShippingFee = Some shippingFee
                 Taxes = totalTaxes
-                IsShippingFree = subTotal > amountToPayForFreeShipping
+                IsShippingFree = decimal subTotal > amountToPayForFreeShipping
             }
 
             printfn "Order summary: %A" orderSummary
