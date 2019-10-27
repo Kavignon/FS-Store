@@ -5,9 +5,9 @@ open System
 type Counter = { Value: int }
 
 type ProductDimension = {
-    Heigth: decimal
-    Width: decimal
-    Depth: decimal option
+    Heigth: float
+    Width: float
+    Depth: float option
 }
 
 type ProductColor =
@@ -42,7 +42,7 @@ type CommonProductInformation  = {
     ShippingWeight: float
     AverageReviews: float
     Dimensions:     ProductDimension
-    Price:          decimal
+    Price:          float
     Color:          ProductColor
     Brand:          Brand
 }
@@ -85,7 +85,7 @@ type Keyboard = {
     DeviceDefinition:   Device
     IsMechanical:       bool
     IsGamingKeyboard:   bool
-    KeyCount:           byte
+    KeyCount:           int
 }
 
 type FightingPad = {
@@ -123,7 +123,7 @@ type DDR =
 
 type CPU = {
     Details:            CommonProductInformation
-    CoreCount:          byte
+    CoreCount:          int
     Series:             ProcessorSeries
     ProcessorSpeed:     float
     OverclockedSpeed:   float
@@ -147,7 +147,7 @@ type GameConsole = {
     SupportedResolutions:   DeviceDisplay list
     Inputs:                 CableConnection list
     IsHandHandledDevice:    bool
-    MaxControllerSupported: byte
+    MaxControllerSupported: int
 }
 
 type BookCategory =
@@ -181,7 +181,7 @@ type HeadphoneFit =
 type HeadphoneProduct = {
     Details:                CommonProductInformation
     Fit:                    HeadphoneFit
-    BatteryLife:            sbyte option
+    BatteryLife:            int option
     ReleaseDate:            DateTime;
     AreWireless:            bool
     IsNoiseCancelActive:    bool
@@ -209,4 +209,4 @@ type Product = {
     Item: StoreProduct
 }
 
-type TestSerializeProduct = { Id: int ; Value : int }
+type TestSerializeProduct = { Id: int ; Value : StoreProduct array }

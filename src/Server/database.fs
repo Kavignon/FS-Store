@@ -23,8 +23,12 @@ let private initializeDb () =
     // let products = fileItems |> Array.mapi(fun i item -> { Id = i; Item = item })
     printfn "Got store products collection"
     let storeProducts = db.GetCollection<TestSerializeProduct>("store_products")
-    let t1 = { Id =1 ; Value = 1}
-    let t2 = { Id =2 ; Value = 1}
+    // TODO: Talk about thoth -> took a while to find decimal error (SAFE Template)
+    // Issue during mentorship program - basic .net type but we spent too much time on this
+    // A Can we improve error message and what's your recommendation 
+    // Provide good support for the errors
+    let t1 = { Id =1 ; Value = loadStoreProducts productsFromDatabase  }
+    let t2 = { Id =2 ; Value = loadStoreProducts productsFromDatabase}
     let products = [ t1 ; t2]
     printfn "Inserting products %A" products
     storeProducts.Insert(products) |> ignore
@@ -43,5 +47,5 @@ let getStoreItems() =
     if isNull collection then printfn "Collection is null"
     else printfn "Collection is not null"
     let seq = collection.FindAll()
-    printfn "%A" (Seq.length seq)
-    seq |> Seq.toArray
+    printfn "%A" (Seq.length seq) 
+    seq |> Seq.toArray 

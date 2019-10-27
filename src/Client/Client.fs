@@ -24,7 +24,7 @@ type Msg =
 
 let initialCounter () = Fetch.fetchAs<Counter> "/api/init"
 let fetchProducts () = Fetch.fetchAs<TestSerializeProduct[]> "/api/products"
-
+ 
 // do the equivalent for get products coming from the back-end here.
 
 // will start display the cart info for the customers
