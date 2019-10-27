@@ -1,3 +1,5 @@
+
+
 GROUP Build
 STORAGE: NONE
 RESTRICTION: == netstandard2.0
@@ -786,7 +788,7 @@ STORAGE: NONE
 RESTRICTION: == netcoreapp2.2
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.6.2)
+    FSharp.Core (4.7)
     Giraffe (3.6)
       FSharp.Core (>= 4.5.2)
       Microsoft.AspNetCore.Authentication (>= 2.2)

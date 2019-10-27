@@ -3,7 +3,7 @@ group Server
     framework: netcoreapp2.2
     storage: none
 
-    nuget FSharp.Core
+    nuget FSharp.Core 4.7.0
     nuget Saturn
     nuget Thoth.Json.Giraffe
 
